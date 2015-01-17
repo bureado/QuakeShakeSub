@@ -28,7 +28,7 @@ io.on('connection', function (socket) {
   
   socket.id = connectionIDCounter;  // set ID to counter
   socket.IP = socket.handshake.address;
-  allSocks[connectionIDCounter] = socket.IP;
+  allSocks[socket.id] = socket.IP;
   connectionIDCounter++; // increment counter
   
   printClientStatus(socket, 'Connected');
