@@ -1,8 +1,7 @@
-// Setup express 4 server
+// Setup Socket.io
 var config = require('./config');
 var os = require('os');
-var app = require('express')();
-var server = require('http').Server(app);
+var server = require('http').Server();
 var io = require('socket.io')(server);
 var port = process.env.PORT || 8080;
 var buffMax = 1000;
@@ -15,13 +14,9 @@ var WebSocket = require('ws');
 var allSocks = {};  // associative array to store connections ; tried [] array but 'splice' doesn't seem to work.
 connectionIDCounter = 0;
 
-// Start Express/Socket.IO
+// Start Socket.io
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
-});
-
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/public/index.html');
 });
 
 // Handle incoming Socket.IO
