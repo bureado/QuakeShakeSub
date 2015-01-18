@@ -11,7 +11,6 @@ var buffer =[];
 var util = require('util');
 var WebSocket = require('ws');
 
-var allSocks = {};  // associative array to store connections ; tried [] array but 'splice' doesn't seem to work.
 connectionIDCounter = 0;
 
 // Start Socket.io
@@ -26,9 +25,6 @@ io.on('connection', function (socket) {
     socket.send(buffer[i]);
    }
   
-  socket.id = connectionIDCounter;  // set ID to counter
-  socket.IP = socket.handshake.address;
-  allSocks[socket.id] = socket.IP;
   connectionIDCounter++; // increment counter
   
   printClientStatus(socket, 'Connected');
@@ -37,7 +33,6 @@ io.on('connection', function (socket) {
   socket.on('disconnect', function () {
     // Remove disconnected client from the array.
     printClientStatus(socket, 'Disconnected');
-    delete allSocks[socket.id];
     delete socket.namespace.sockets[socket.id];  // possible fix for deleted sockets "hanging" in memory: https://github.com/Automattic/socket.io/issues/407
 	printClientCount();
   });
@@ -94,7 +89,7 @@ process.on('uncaughtException', function(err) {
 });
 
 function printClientCount() {
-  console.log('Connected SocketIO Clients:  ' + this.Object.size(allSocks));
+  console.log('Connected SocketIO Clients:  ' + io.engine.clientsCount);
   console.log('Total SocketIO Clients (lifetime): ' + connectionIDCounter);
 }
 
@@ -105,15 +100,6 @@ function printClientStatus(socket, status) {
 function printSourceStatus(status) {
 	console.log(new Date() + ' ' + status + ' ' + config.sourceSocket);
 }
-
-// prototype to return size of associative array
-Object.size = function(obj) {
-  var size = 0, key;
-  for (key in obj) {
-      if (obj.hasOwnProperty(key)) size++;
-  }
-  return size;
-};
 
 //simple buffer treated as queue.
 //this queue shift is really O(n) but
